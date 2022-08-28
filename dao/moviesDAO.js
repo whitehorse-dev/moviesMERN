@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb"
+
 let movies
 
 // movies stores the reference to database.
@@ -47,4 +49,39 @@ export default class MoviesDAO {
       return { moviesList: [], totalNumberoMovies: 0 }
     }
   }
+
+
+  static async getRatings(){
+    let ratings = []
+    try {
+      ratings = await movies.distinct("rated")
+      return ratings
+    } catch (error) {
+      console.log('Unable to find ratings '+e)
+      return ratings
+    }
+  }
+
+  static async getMovieById(id){
+    try {
+ return await movies.aggregate([
+  {
+    $match:{
+      _id:new ObjectId(id),
+    }
+  }, 
+  {
+    $lookup:
+    {from: 'reviews', 
+  localField: '_id', 
+foreignField: 'movie_id', 
+as: 'reviews',}
+  }
+ ])
+    } catch (error) {
+ console.error('Something went wrong in getting MovieByID: ${error}')
+ throw error
+    }
+  }
+
 }
